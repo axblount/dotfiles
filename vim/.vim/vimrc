@@ -29,8 +29,8 @@ set fileformats=unix,dos,mac
 " the trailing double slash tells vim to name
 " the temp files based on the files entire path.
 " this avoids conflicts
-set directory=~/.vim/swap//
 set undofile
+set directory=~/.vim/swap//
 set undodir=~/.vim/undo//
 
 " Two hundred and fifty six colors, baby
