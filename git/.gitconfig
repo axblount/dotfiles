@@ -1,0 +1,9 @@
+[include]
+    path = ~/.gitconfig.private
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore.global
+[push]
+    default = simple
+[alias]
+    graph = log --graph --oneline --decorate --date=relative --all

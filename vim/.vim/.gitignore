@@ -1,0 +1,8 @@
+# let vundle handle it
+bundle/*
+!bundle/vundle/
+
+# temp files
+swap/
+undo/
+
