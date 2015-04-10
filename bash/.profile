@@ -12,7 +12,6 @@ esac
 export EDITOR=vim
 export VISUAL=vim
 export PAGER=less
-export LESS=-N
 
 if [ -n "$BASH" -a -z "$POSIXLY_CORRECT" ];
 then

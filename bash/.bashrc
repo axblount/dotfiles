@@ -7,11 +7,11 @@
 [ -f /etc/bash_completion ] && source /etc/bash_completion
 
 # Set the TERM so that tmux uses 256 colors
-if [ -n "$TMUX" ]; then
-    export TERM=screen-265color
-else
-    export TERM=xterm-256color
-fi
+#if [ -n "$TMUX" ]; then
+#    export TERM=screen-265color
+#else
+#    export TERM=xterm-256color
+#fi
 
 # some more ls aliases
 alias ls='ls -bkF --color=auto'

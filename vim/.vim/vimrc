@@ -167,3 +167,15 @@ augroup end
 let g:airline#extensions#bufferline#overwrite_variables=0
 let g:airline_powerline_fonts=1
 let g:airline_theme='solarized'
+
+"
+" No arrows!
+"
+inoremap <Up> <NOP>
+inoremap <Down> <NOP>
+inoremap <Left> <NOP>
+inoremap <Right> <NOP>
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
