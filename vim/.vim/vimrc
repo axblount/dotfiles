@@ -1,7 +1,7 @@
 set nocompatible
 filetype off
 
-set runtimepath+=~/.vim/bundle/vundle
+set runtimepath+=$HOME/.vim/bundle/vundle
 call vundle#begin()
 
 Plugin 'gmarik/Vundle.vim'
@@ -29,9 +29,12 @@ set fileformats=unix,dos,mac
 " the trailing double slash tells vim to name
 " the temp files based on the files entire path.
 " this avoids conflicts
-set undofile
-set directory=~/.vim/swap//
-set undodir=~/.vim/undo//
+set directory=~/.vim/swap//,/var/tmp//,/tmp//
+set nobackup
+if exists('+undofile')
+    set undodir=~/.vim/undo//,/var/tmp//,/tmp//
+    set undofile
+endif
 
 " Two hundred and fifty six colors, baby
 set t_Co=256

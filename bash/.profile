@@ -1,7 +1,7 @@
 #!/bin/sh
 # ~/.profile: executed by the command interpreter for login shells.
 
-export PATH="$PATH:$HOME/bin"
+export PATH="$HOME/bin:$PATH"
 
 # Check for interactive shell
 case "$-" in

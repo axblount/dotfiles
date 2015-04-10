@@ -5,7 +5,4 @@ if [ "$PWD" != "$HOME/dotfiles" ]; then
     exit 1
 fi
 
-# don't stow '.' or '.git'
-for repo in $(find . -maxdepth 1 ! -path . ! -path '*.git' -type d); do
-    stow $@ "$(basename "$repo")"
-done
+stow -v $@ $(\ls -1d */ | cut -d'/' -f1)
