@@ -1,12 +1,13 @@
 set nocompatible
 filetype off
 
-set runtimepath+=$HOME/.vim/bundle/vundle
+set runtimepath+=$HOME/.vim/bundle/Vundle.vim
 call vundle#begin()
 
-Plugin 'gmarik/Vundle.vim'
+Plugin 'VundleVim/Vundle.vim'
 
-Plugin 'bling/vim-airline'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 Plugin 'bling/vim-bufferline'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
@@ -27,8 +28,8 @@ set fileformats=unix,dos,mac
 
 " set temp directories.
 " the trailing double slash tells vim to name
-" the temp files based on the files entire path.
-" this avoids conflicts
+" the temp files based on the files entire path,
+" not just the name. This avoids conflicts.
 set directory=~/.vim/swap//,/var/tmp//,/tmp//
 set nobackup
 if exists('+undofile')
@@ -79,18 +80,17 @@ set sidescrolloff=5
 
 set display+=lastline
 
-" statusline DEPRECATED
-" set statusline=%f\ %m%<\ %H%W%R\ %q
-" set statusline+=%=
-" set statusline+=%Y\ c:%c\ l:%l/%L\ %P
-
 " but in case I do this will keep
 " pathogen from screwing up
 set sessionoptions-=options
 
 " Don't use fish to execute shell commands!
 if &shell =~# 'fish$'
-    set shell=/bin/bash
+    if !empty(glob("/bin/bash"))
+        set shell=/bin/bash
+    else
+        set shell=/bin/sh
+    endif
 endif
 
 " for the heathen

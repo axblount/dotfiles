@@ -4,7 +4,7 @@
 export PATH="$HOME/bin:$PATH"
 
 # Check for interactive shell
-case "$-" in
+case $- in
     *i*) ;;
     *) return ;;
 esac

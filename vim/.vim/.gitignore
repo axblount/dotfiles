@@ -1,8 +1,7 @@
 # let vundle handle it
 bundle/*
-!bundle/vundle/
+!bundle/Vundle.vim/
 
 # temp files
 swap/
 undo/
-

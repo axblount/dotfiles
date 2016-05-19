@@ -6,8 +6,9 @@ I manage it with GNU Stow, as outlined by [xero][1].
 
 ## Install
 ```sh
+$ sudo apt-get install stow # obviously this will change based on distro
 $ cd
-$ git clone https://github.com/axblount/dotfiles
+$ git clone --recursive https://github.com/axblount/dotfiles
 $ cd dotfiles
 $ ./install.sh
 ```
