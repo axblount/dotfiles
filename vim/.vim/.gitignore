@@ -5,3 +5,4 @@ bundle/*
 # temp files
 swap/
 undo/
+view/

@@ -33,6 +33,12 @@ HISTFILESIZE=
 
 # everything else is prompt...
 
+source ~/.git-prompt.sh
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+export GIT_PS1_SHOWCOLORHINTS=1
+
 smiley() {
     if [ $? = 0 ]; then
         echo -en "$1:)"
@@ -72,7 +78,7 @@ set_prompt() {
     local CYAN_BACK="\[\e[46m\]"
     local LGRAY_BACK="\[\e[47m\]"
 
-    PS1="$B$RED\$$BLUE\u$C$GREEN at $B\h$C$PURPLE in $B\w"
+    PS1="$B$RED\$$BLUE\u$C$GREEN at $B\h$C$PURPLE in $B\w$C\$(__git_ps1 ' (%s)')"
     PS1="$PS1\n$C\$(smiley $GREEN $RED) $C"
 
     PS2="$YELLOW>$C "

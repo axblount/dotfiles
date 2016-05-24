@@ -31,11 +31,11 @@ set fileformats=unix,dos,mac
 " the temp files based on the files entire path,
 " not just the name. This avoids conflicts.
 set directory=~/.vim/swap//,/var/tmp//,/tmp//
-set nobackup
 if exists('+undofile')
     set undodir=~/.vim/undo//,/var/tmp//,/tmp//
     set undofile
 endif
+set nobackup
 
 " Two hundred and fifty six colors, baby
 set t_Co=256
@@ -80,17 +80,11 @@ set sidescrolloff=5
 
 set display+=lastline
 
-" but in case I do this will keep
-" pathogen from screwing up
-set sessionoptions-=options
-
-" Don't use fish to execute shell commands!
-if &shell =~# 'fish$'
-    if !empty(glob("/bin/bash"))
-        set shell=/bin/bash
-    else
-        set shell=/bin/sh
-    endif
+" Use a sane shell for commands
+if !empty(glob("/bin/bash"))
+    set shell=/bin/bash
+else
+    set shell=/bin/sh
 endif
 
 " for the heathen
@@ -131,10 +125,17 @@ augroup filetype_settings
 augroup end
 
 augroup rainbow_parentheses
+    au!
     au VimEnter * RainbowParenthesesToggle
     au Syntax * RainbowParenthesesLoadRound
     au Syntax * RainbowParenthesesLoadSquare
     au Syntax * RainbowParenthesesLoadBraces
+augroup end
+
+augroup restore_cursor
+    au!
+    au BufWinLeave * mkview
+    au BufWinEnter * silent loadview
 augroup end
 
 "
