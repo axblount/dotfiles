@@ -6,11 +6,11 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
+Plugin 'sheerun/vim-polyglot'
+
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'bling/vim-bufferline'
-Plugin 'tpope/vim-fugitive'
-Plugin 'scrooloose/nerdtree'
 
 Plugin 'vim-scripts/paredit.vim'
 Plugin 'kien/rainbow_parentheses.vim'
@@ -62,6 +62,7 @@ set shiftwidth=4
 set expandtab
 set autoindent
 set smartindent
+set breakindent
 set smarttab
 set nowrap
 set listchars=tab:>-,trail:•,precedes:<,extends:>
@@ -87,8 +88,8 @@ else
     set shell=/bin/sh
 endif
 
-" for the heathen
-set mouse=a
+" no longer a heathen
+set mouse=
 
 " reload file when it's modified elsewhere
 set autoread
@@ -139,33 +140,6 @@ augroup restore_cursor
 augroup end
 
 "
-" NERDTree Stuff
-"
-"
-function s:StartNerdTree()
-    if argc() == 0 && !exists("s:reading_from_stdin")
-        " open nerdtree
-        NERDTree
-        " switch back to the previous buffer
-        " wincmd p
-    endif
-endfunction
-
-function s:QuitNerdTreeIfLast()
-    if winnr("$") == 1
-  \ && exists("b:NERDTreeType")
-  \ && b:NERDTreeType == "primary"
-        quit
-    endif
-endfunction
-
-augroup NerdTreeAuto
-    au StdinReadPre * let s:reading_from_stdin=1
-    au VimEnter * call s:StartNerdTree()
-    au BufEnter * call s:QuitNerdTreeIfLast()
-augroup end
-
-"
 " Airline
 "
 let g:airline#extensions#bufferline#overwrite_variables=0
@@ -175,11 +149,11 @@ let g:airline_theme='solarized'
 "
 " No arrows!
 "
-inoremap <Up> <NOP>
-inoremap <Down> <NOP>
-inoremap <Left> <NOP>
-inoremap <Right> <NOP>
-noremap <Up> <NOP>
-noremap <Down> <NOP>
-noremap <Left> <NOP>
-noremap <Right> <NOP>
+" inoremap <Up> <NOP>
+" inoremap <Down> <NOP>
+" inoremap <Left> <NOP>
+" inoremap <Right> <NOP>
+" noremap <Up> <NOP>
+" noremap <Down> <NOP>
+" noremap <Left> <NOP>
+" noremap <Right> <NOP>
