@@ -44,6 +44,10 @@ set background=dark
 let g:solarized_termcolors=256
 colorscheme solarized
 
+" Preserve terminal background
+" hi Normal ctermbg=none guibg=none
+" hi NonText ctermbg=none guibg=none
+
 if has('gui_running')
     set guifont=Inconsolata-g\ for\ Powerline\ 10
     " hide toolbar and scrollbar in gvim

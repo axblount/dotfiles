@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PATH=$HOME/bin:$HOME/node/bin:/usr/games/:$PATH
+export PATH=$HOME/bin:/usr/games/:$PATH
 
 # enable bash completion if it is available
 [ -f /etc/bash_completion ] && source /etc/bash_completion
@@ -21,20 +21,29 @@ alias rm='rm -iv'
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias grep='grep --color=auto'
-alias fgrep='grep -F'
-alias egrep='grep -E'
 alias :q='exit'
+alias xcopy='xclip -selection clipboard -i'
+alias xpaste='xclip -selection clipboard -o'
 
 shopt -s checkwinsize
 shopt -s histappend
 shopt -s nocaseglob
 
 HISTCONTROL=ignoreboth
-HISTSIZE=1000
+HISTSIZE=10000
 HISTFILESIZE=
 
 nfs() {
     ssh ${1}_${2}@ssh.phx.nearlyfreespeech.net
+}
+
+serve() {
+    port="${1:-8888}"
+    if type -P python3; then
+        python3 -m http.server $port
+    else
+        python2 -m SimpleHTTPServer $port
+    fi
 }
 
 # everything else is prompt...
