@@ -46,6 +46,20 @@ serve() {
     fi
 }
 
+# activate the virtual environment
+activate() {
+    if [ -f .venv/bin/activate ]; then
+        source .venv/bin/activate
+        return 0
+    elif [ -f venv/bin/activate ]; then
+        source .venv/bin/activate
+        return 0
+    else
+        echo "Couldn't find virtualenv."
+        return 1
+    fi
+}
+
 # everything else is prompt...
 
 source ~/.git-prompt.sh

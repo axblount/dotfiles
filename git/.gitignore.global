@@ -21,3 +21,7 @@ Session.vim
 *.tar
 *.zip
 
+# python
+__pycache__/
+*.py[cod]
+.venv/
