@@ -16,7 +16,7 @@ set -o vi
 
 # some more ls aliases
 alias ls='ls -bkF --color=auto'
-alias tree='tree -F --dirsfirst'
+alias tree='tree -CF --dirsfirst'
 alias rm='rm -iv'
 alias cp='cp -iv'
 alias mv='mv -iv'
