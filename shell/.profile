@@ -1,4 +1,3 @@
-#!/bin/sh
 # ~/.profile: executed by the command interpreter for login shells.
 
 export PATH="~/bin:$PATH"
