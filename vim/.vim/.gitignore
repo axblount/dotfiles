@@ -1,6 +1,5 @@
 # let vundle handle it
-bundle/*
-!bundle/Vundle.vim/
+plugs/*
 
 # temp files
 swap/
