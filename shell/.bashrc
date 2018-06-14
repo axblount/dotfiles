@@ -2,6 +2,8 @@
 #
 # Stuff for interactive shells
 
+[[ "$-" != *i* ]] && return
+
 # enable bash completion if it is available
 [ -f /etc/bash_completion ] && source /etc/bash_completion
 
@@ -18,6 +20,7 @@ alias :q='exit'
 alias xcopy='xclip -selection clipboard -i'
 alias xpaste='xclip -selection clipboard -o'
 
+shopt -s extglob
 shopt -s checkwinsize
 shopt -s histappend
 shopt -s nocaseglob
@@ -55,12 +58,6 @@ activate() {
 
 # everything else is prompt...
 
-source ~/.git-prompt.sh
-export GIT_PS1_SHOWDIRTYSTATE=1
-export GIT_PS1_SHOWSTASHSTATE=1
-export GIT_PS1_SHOWUNTRACKEDFILES=1
-export GIT_PS1_SHOWCOLORHINTS=1
-
 smiley() {
     if [ $? = 0 ]; then
         echo -en "$1:)"
@@ -70,6 +67,12 @@ smiley() {
 }
 
 set_prompt() {
+    source ~/.git-prompt.sh
+    export GIT_PS1_SHOWDIRTYSTATE=1
+    export GIT_PS1_SHOWSTASHSTATE=1
+    export GIT_PS1_SHOWUNTRACKEDFILES=1
+    export GIT_PS1_SHOWCOLORHINTS=1
+
     # clear color and style
     local C="\[\e[0m\]"
     # make bold

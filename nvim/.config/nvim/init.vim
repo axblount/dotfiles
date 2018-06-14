@@ -1,25 +1,18 @@
 set nocompatible
-filetype off
 
-if empty(glob('~/.vim/autoload/plug.vim'))
-    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+    silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
         \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     au VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-call plug#begin('~/.vim/plugs')
-
+call plug#begin('~/.local/share/nvim/plugs')
 Plug 'sheerun/vim-polyglot'
-
 Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 Plug 'bling/vim-bufferline'
-
 Plug 'vim-scripts/paredit.vim'
 Plug 'junegunn/rainbow_parentheses.vim'
-
-Plug 'altercation/vim-colors-solarized'
-
+Plug 'junegunn/seoul256.vim'
 call plug#end()
 
 filetype plugin indent on
@@ -31,25 +24,21 @@ set fileformats=unix,dos,mac
 
 " set temp directories.
 " the trailing double slash tells vim to name
-" the temp files based on the files entire path,
+" the temp files based on the file's entire path,
 " not just the name. This avoids conflicts.
-set directory=~/.vim/swap//,/var/tmp//,/tmp//
+set directory=~/.local/share/nvim/swap//,/var/tmp//,/tmp//
 if exists('+undofile')
-    set undodir=~/.vim/undo//,/var/tmp//,/tmp//
+    set undodir=~/.local/share/nvim/undo//,/var/tmp//,/tmp//
     set undofile
 endif
 set nobackup
 
-" Two hundred and fifty six colors, baby
-set t_Co=256
+" 24-bit color
+set termguicolors
+colo seoul256
 set background=dark
-
-let g:solarized_termcolors=256
-colorscheme solarized
-
-" Preserve terminal background
-" hi Normal ctermbg=none guibg=none
-" hi NonText ctermbg=none guibg=none
+hi! Normal ctermbg=none guibg=none
+hi! NonText ctermbg=none guibg=none
 
 if has('gui_running')
     set guifont=Inconsolata-g\ for\ Powerline\ 10
@@ -95,9 +84,6 @@ else
     set shell=/bin/sh
 endif
 
-" no longer a heathen
-set mouse=
-
 " reload file when it's modified elsewhere
 set autoread
 
@@ -106,11 +92,6 @@ set autoread
 if &term == 'xterm-256color' || &term == 'screen-256color'
     let &t_SI = "\<Esc>[5 q"
     let &t_EI = "\<Esc>[1 q"
-endif
-
-if exists('$TMUX')
-    let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
-    let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
 endif
 
 " for my fat fingers
@@ -137,22 +118,22 @@ augroup rainbow_parentheses
     au VimEnter * RainbowParentheses
 augroup end
 
-augroup restore_cursor
-    au!
-    au BufWinLeave * mkview
-    au BufWinEnter * silent loadview
-augroup end
+" augroup restore_cursor
+"     au!
+"     au BufLeave,BufWinLeave ?* silent mkview
+"     au BufWinEnter ?* silent loadview
+" augroup end
 
 "
 " Airline
 "
 let g:airline#extensions#bufferline#overwrite_variables=0
 let g:airline_powerline_fonts=1
-let g:airline_theme='solarized'
 
 "
-" No arrows!
+" Hardcore mode
 "
+set mouse=
 inoremap <Up> <NOP>
 inoremap <Down> <NOP>
 inoremap <Left> <NOP>

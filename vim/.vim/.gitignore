@@ -1,7 +1,0 @@
-# let vundle handle it
-plugs/*
-
-# temp files
-swap/
-undo/
-view/

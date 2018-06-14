@@ -2,7 +2,6 @@
     path = ~/.gitconfig.private
 [core]
     editor = vim
-    excludesfile = ~/.gitignore.global
 [push]
     default = simple
 [alias]
