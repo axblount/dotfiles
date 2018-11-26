@@ -1,7 +1,14 @@
 set nocompatible
 
-if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
-    silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+if empty($XDG_DATA_HOME)
+    let $XDG_DATA_HOME=~/.local/share
+    echoerr "XDG_DATA_HOME wasn't set, defaulting to ".$XDG_DATA_HOME
+endif
+
+" All plugins are managed with plug.
+
+if empty(glob($XDG_DATA_HOME.'/nvim/site/autoload/plug.vim'))
+    silent !curl -fLo $XDG_DATA_HOME/nvim/site/autoload/plug.vim --create-dirs
         \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     au VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
@@ -20,37 +27,35 @@ set number
 syntax enable
 
 set encoding=utf-8
-set fileformats=unix,dos,mac
+set fileformats=unix,dos
 
 " set temp directories.
 " the trailing double slash tells vim to name
 " the temp files based on the file's entire path,
 " not just the name. This avoids conflicts.
-set directory=~/.local/share/nvim/swap//,/var/tmp//,/tmp//
+set directory=$XDG_DATA_HOME/nvim/swap//,/var/tmp//,/tmp//
 if exists('+undofile')
-    set undodir=~/.local/share/nvim/undo//,/var/tmp//,/tmp//
+    set undodir=$XDG_DATA_HOME/nvim/undo//,/var/tmp//,/tmp//
     set undofile
 endif
 set nobackup
+
+" Save and restore cursor position
+set shada='100,<1000,s100
+autocmd BufReadPost *
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \   exe "normal! '\"" |
+    \ endif
 
 " 24-bit color
 set termguicolors
 colo seoul256
 set background=dark
-hi! Normal ctermbg=none guibg=none
-hi! NonText ctermbg=none guibg=none
+" Uncomment these lines to preserve a transparent terminal background
+" hi! Normal ctermbg=none guibg=none
+" hi! NonText ctermbg=none guibg=none
 
-if has('gui_running')
-    set guifont=Inconsolata-g\ for\ Powerline\ 10
-    " hide toolbar and scrollbar in gvim
-    set guioptions-=T
-    set guioptions-=r
-    set guioptions-=R
-    set guioptions-=l
-    set guioptions-=L
-    set guioptions-=b
-endif
-
+set autoread
 set backspace=indent,eol,start
 set tabstop=4
 set softtabstop=4
@@ -65,17 +70,14 @@ set listchars=tab:>-,trail:•,precedes:<,extends:>
 set list
 set complete-=i
 set incsearch
-
 set laststatus=2
-set ruler
 set showcmd
 set wildmenu
-
 set sidescroll=1
 set scrolloff=3
 set sidescrolloff=5
-
 set display+=lastline
+set colorcolumn=80
 
 " Use a sane shell for commands
 if !empty(glob("/bin/bash"))
@@ -83,9 +85,6 @@ if !empty(glob("/bin/bash"))
 else
     set shell=/bin/sh
 endif
-
-" reload file when it's modified elsewhere
-set autoread
 
 " Cursor Shapes
 " Use a blinking upright bar cursor in Insert mode, a blinking block in normal
@@ -114,15 +113,8 @@ augroup filetype_settings
 augroup end
 
 augroup rainbow_parentheses
-    au!
-    au VimEnter * RainbowParentheses
+    au! VimEnter * RainbowParentheses
 augroup end
-
-" augroup restore_cursor
-"     au!
-"     au BufLeave,BufWinLeave ?* silent mkview
-"     au BufWinEnter ?* silent loadview
-" augroup end
 
 "
 " Airline
