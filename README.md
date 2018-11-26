@@ -10,20 +10,19 @@ Install
 ```sh
 $ sudo apt-get install stow # obviously this will change based on distro
 $ cd
-$ git clone --recursive https://github.com/axblount/dotfiles
+$ git clone https://github.com/axblount/dotfiles
 $ cd dotfiles
 $ ./install.sh
 ```
 
-`install.sh` runs stow against all repositories in the folder.
-Any arguments passed to the script are given to stow. The recursive
-clone is necessary because I use git submodules as part of my vim setup.
+`install.sh` runs stow against all repositories in the folder. If a `fonts`
+folder exists, it rebuilds the font cache. Any arguments passed to the script
+are given to stow.
 
-If manage `~/.fonts` as part of your dotfiles, `install.sh` will also
-rebuild the font cache.
+Examples
+--------
 
-### Examples
-#### Perform a dry run, showing what links will be created:
+#### Perform a dry run, showing the links that will be created:
 ```sh
 cd ~/dotfiles
 ./install.sh -n -v
