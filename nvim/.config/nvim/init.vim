@@ -20,6 +20,9 @@ Plug 'bling/vim-bufferline'
 Plug 'vim-scripts/paredit.vim'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'junegunn/seoul256.vim'
+
+" Trying these out
+Plug 'Lokaltog/vim-monotone'
 call plug#end()
 
 filetype plugin indent on
@@ -49,8 +52,11 @@ autocmd BufReadPost *
 
 " 24-bit color
 set termguicolors
-colo seoul256
-set background=dark
+" colo seoul256
+" set background=dark
+
+colo monotone
+
 " Uncomment these lines to preserve a transparent terminal background
 " hi! Normal ctermbg=none guibg=none
 " hi! NonText ctermbg=none guibg=none
@@ -121,6 +127,12 @@ augroup end
 "
 let g:airline#extensions#bufferline#overwrite_variables=0
 let g:airline_powerline_fonts=1
+
+" Have Esc work normally in :terminal
+tnoremap <C-w>h <C-\><C-n><C-w>h
+tnoremap <C-w>j <C-\><C-n><C-w>j
+tnoremap <C-w>k <C-\><C-n><C-w>k
+tnoremap <C-w>l <C-\><C-n><C-w>l
 
 "
 " Hardcore mode
