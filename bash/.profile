@@ -10,15 +10,10 @@ export EDITOR=vim
 export VISUAL=vim
 export PAGER=less
 
-export PATH="$HOME/.rakudobrew/bin:$PATH"
-rakudobrew() {
-    local command
-    command="$1"
-    if [ "$#" -gt 0 ]; then
-        shift
-    fi
-    case "$command" in
-        shell) eval "`rakudobrew "sh" "$@"`";;
-        *) command rakudobrew "$command" "$@";;
-    esac
-}
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+fi
+
+export PATH="$HOME/.poetry/bin:$PATH"

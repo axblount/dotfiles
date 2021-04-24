@@ -115,7 +115,7 @@ augroup end
 
 augroup filetype_settings
     au FileType make setlocal noexpandtab nolist
-    au FileType scheme,xml,ant,lisp,ruby,html,eruby setlocal ts=2 sts=2 sw=2
+    au FileType javascript,scheme,xml,ant,lisp,ruby,html,eruby setlocal ts=2 sts=2 sw=2
 augroup end
 
 augroup rainbow_parentheses
