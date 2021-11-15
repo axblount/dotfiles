@@ -52,10 +52,8 @@ autocmd BufReadPost *
 
 " 24-bit color
 set termguicolors
-" colo seoul256
+colo seoul256
 " set background=dark
-
-colo monotone
 
 " Uncomment these lines to preserve a transparent terminal background
 " hi! Normal ctermbg=none guibg=none
