@@ -1,8 +1,8 @@
 set nocompatible
 
 if empty($XDG_DATA_HOME)
-    let $XDG_DATA_HOME=~/.local/share
-    echoerr "XDG_DATA_HOME wasn't set, defaulting to ".$XDG_DATA_HOME
+    echoerr "$XDG_DATA_HOME isn't set, bailing."
+    finish
 endif
 
 " All plugins are managed with plug.
@@ -10,19 +10,19 @@ endif
 if empty(glob($XDG_DATA_HOME.'/nvim/site/autoload/plug.vim'))
     silent !curl -fLo $XDG_DATA_HOME/nvim/site/autoload/plug.vim --create-dirs
         \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    au VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-call plug#begin('~/.local/share/nvim/plugs')
+autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+    \| PlugInstall --sync | source $MYVIMRC
+\| endif
+
+call plug#begin($XDG_DATA_HOME.'/nvim/plugs')
 Plug 'sheerun/vim-polyglot'
 Plug 'vim-airline/vim-airline'
 Plug 'bling/vim-bufferline'
 Plug 'vim-scripts/paredit.vim'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'junegunn/seoul256.vim'
-
-" Trying these out
-Plug 'Lokaltog/vim-monotone'
 call plug#end()
 
 filetype plugin indent on

@@ -1,9 +1,15 @@
-#!/bin/bash
-#
-# Stuff for interactive shells
+# This file is sourced by all *interactive* bash shells on startup,
+# including some apparently interactive shells such as scp and rcp
+# that can't tolerate any output.  So make sure this doesn't display
+# anything or bad things will happen !
 
-# if the shell isn't interactive, get out of here.
-[[ "$-" != *i* ]] && return
+# Test for an interactive shell.  There is no need to set anything
+# past this point for scp and rcp, and it's important to refrain from
+# outputting anything in those cases.
+if [[ $- != *i* ]] ; then
+    # Shell is non-interactive.  Be done now!
+    return
+fi
 
 # enable bash completion if it is available
 [ -f /etc/bash_completion ] && source /etc/bash_completion
@@ -19,8 +25,6 @@ alias cp='cp -iv'
 alias mv='mv -iv'
 alias grep='grep --color=auto'
 alias :q='exit'
-alias xcopy='xclip -selection clipboard -i'
-alias xpaste='xclip -selection clipboard -o'
 
 shopt -s extglob
 shopt -s checkwinsize
@@ -60,7 +64,7 @@ activate() {
 
 # everything else is prompt...
 
-smiley() {
+function smiley() {
     if [ $? = 0 ]; then
         echo -en "$1:)"
     else
@@ -75,11 +79,28 @@ export GIT_PS1_SHOWUNTRACKEDFILES=1
 export GIT_PS1_SHOWCOLORHINTS=1
 
 # tput with escaped output for non-printing characters
-tpute() {
-    echo "\[$(tput $@)\]"
+function tpute() {
+    echo -n "\[$(tput $@)\]"
 }
 
-set_prompt() {
+function set_prompt() {
+    local tri=""
+    # clear style
+    local c=$(tpute sgr0)
+    # bold
+    local b=$(tpute bold)
+
+    # start first segment
+    local s1="$(tpute setaf 0; tpute setab 21)"
+    # transition from segment 1 to 2
+    local s12="$(tpute setaf 21; tpute setab 45)$tri$(tpute setaf 0)"
+    # transtion from segment 2 to default
+    local s2c="$c$(tpute setaf 45)$tri$c"
+
+    PS1="$s1 \u $s12 \w $s2c "
+}
+: <<COMMENT
+function set_prompt() {
     # clear color and style
     local C=$(tpute sgr0)
     # make bold
@@ -97,6 +118,7 @@ set_prompt() {
     PS1="$PS1\n$C\$(smiley $GREEN $RED)$C "
     PS2=" $CYAN>$C "
 }
+COMMENT
 
 set_prompt
 unset -f set_prompt
