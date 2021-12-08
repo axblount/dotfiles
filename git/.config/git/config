@@ -6,3 +6,5 @@
     default = simple
 [alias]
     graph = log --graph --oneline --decorate --date=relative --all
+[credential]
+    helper = store

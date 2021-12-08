@@ -14,7 +14,7 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term kitty
+set $term foot
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
@@ -57,6 +57,20 @@ set $menu dmenu_path | dmenu | xargs swaymsg exec --
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
+
+exec swayidle -w \
+    timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
+
+input "2:7:SynPS/2_Synaptics_TouchPad" {
+    dwt enabled
+    tap enabled
+    tap_button_map lrm
+    natural_scroll enabled
+    scroll_factor 2
+    middle_emulation enabled
+}
+
+for_window [app_id="pavucontrol"] floating enable, resize set 800 600
 
 ### Key bindings
 #
@@ -202,25 +216,32 @@ bindsym $mod+r mode "resize"
 # Read `man 5 sway-bar` for more information about this section.
 bar {
     position top
+    font "Gohu GohuFont"
+    separator_symbol " — "
 
-    # When the status_command prints a new line to stdout, swaybar updates.
-    # The default just shows the current date and time.
-    status_command /home/alex/mybar.py
-    # status_command while date +[$(cat /sys/class/power_supply/BAT0/capacity)%]' '[$(cat /sys/class/power_supply/BAT1/capacity)%]' [%Y-%m-%d %H:%M:%S]'; do sleep 1; done
+    status_command $XDG_CONFIG_HOME/sway/bar.sh
 
-    colors {
-        statusline #ffffff
-        background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
-    }
+#    colors {
+#        statusline #ffffff
+#        background #323232
+#        inactive_workspace #32323200 #32323200 #5c5c5c
+#    }
 }
 
-bindsym XF86MonBrightnessDown exec light -U 2
+
+# Theme
+# no titlebars
+default_border pixel 2
+
+
+# Keybindings
+
+bindsym XF86MonBrightnessDown exec light -U 4
 bindsym XF86MonBrightnessUp exec light -A 4
 
-bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
-bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
-bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
-bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioRaiseVolume exec thinkpad.sh vol +5%
+bindsym XF86AudioLowerVolume exec thinkpad.sh vol -5%
+bindsym XF86AudioMute exec thinkpad.sh mute
+bindsym XF86AudioMicMute exec thinkpad.sh micmute
 
 include /etc/sway/config.d/*

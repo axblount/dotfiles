@@ -1,29 +1,27 @@
 set nocompatible
 
-if empty($XDG_DATA_HOME)
-    echoerr "$XDG_DATA_HOME isn't set, bailing."
-    finish
-endif
-
 " All plugins are managed with plug.
-
-if empty(glob($XDG_DATA_HOME.'/nvim/site/autoload/plug.vim'))
-    silent !curl -fLo $XDG_DATA_HOME/nvim/site/autoload/plug.vim --create-dirs
-        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if empty(glob(stdpath('data') . '/site/autoload/plug.vim'))
+    exe '!curl -fLo' stdpath('data') . '/site/autoload/plug.vim --create-dirs'
+        \ 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 endif
 
-autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
-    \| PlugInstall --sync | source $MYVIMRC
-\| endif
-
-call plug#begin($XDG_DATA_HOME.'/nvim/plugs')
+call plug#begin(stdpath('data') . '/plugs')
 Plug 'sheerun/vim-polyglot'
-Plug 'vim-airline/vim-airline'
+Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
+Plug 'preservim/nerdtree'
+Plug 'tpope/vim-fugitive'
+Plug 'itchyny/lightline.vim'
 Plug 'bling/vim-bufferline'
-Plug 'vim-scripts/paredit.vim'
-Plug 'junegunn/rainbow_parentheses.vim'
-Plug 'junegunn/seoul256.vim'
+Plug 'junegunn/rainbow_parentheses.vim', { 'for': ['lisp', 'scheme', 'clojure'] }
+Plug 'xero/sourcerer.vim'
+Plug 'fcpg/vim-fahrenheit'
 call plug#end()
+
+autocmd VimEnter *
+    \  if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+    \|     PlugInstall --sync | q
+    \| endif
 
 filetype plugin indent on
 set number
@@ -36,9 +34,9 @@ set fileformats=unix,dos
 " the trailing double slash tells vim to name
 " the temp files based on the file's entire path,
 " not just the name. This avoids conflicts.
-set directory=$XDG_DATA_HOME/nvim/swap//,/var/tmp//,/tmp//
+set directory=$XDG_DATA_HOME/nvim/swap//,/var/tmp/nvim//,/tmp/nvim//
 if exists('+undofile')
-    set undodir=$XDG_DATA_HOME/nvim/undo//,/var/tmp//,/tmp//
+    set undodir=$XDG_DATA_HOME/nvim/undo//,/var/tmp/nvim//,/tmp/nvim//
     set undofile
 endif
 set nobackup
@@ -50,14 +48,29 @@ autocmd BufReadPost *
     \   exe "normal! '\"" |
     \ endif
 
+"
+" COLOR SCHEMES
+" ENDLESS SUFFERING
+" NEVER SATISFIED
+"
 " 24-bit color
 set termguicolors
-colo seoul256
-" set background=dark
+set background=dark
+colo sourcerer
 
-" Uncomment these lines to preserve a transparent terminal background
-" hi! Normal ctermbg=none guibg=none
-" hi! NonText ctermbg=none guibg=none
+"
+" Status Line
+"
+let g:lightline = {
+    \ 'colorscheme': 'apprentice',
+    \ 'active': {
+    \   'left': [ [ 'mode', 'paste' ],
+    \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+    \ },
+    \ 'component_function': {
+    \   'gitbranch': 'FugitiveHead'
+    \ },
+    \ }
 
 set autoread
 set backspace=indent,eol,start
@@ -83,25 +96,14 @@ set sidescrolloff=5
 set display+=lastline
 set colorcolumn=80
 
-" Use a sane shell for commands
-if !empty(glob("/bin/bash"))
-    set shell=/bin/bash
-else
-    set shell=/bin/sh
-endif
+augroup nerd_tree
+    " run NERDTree on startup if there are no file arguments
+    au StdinReadPre * let s:std_in=1
+    au VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
 
-" Cursor Shapes
-" Use a blinking upright bar cursor in Insert mode, a blinking block in normal
-if &term == 'xterm-256color' || &term == 'screen-256color'
-    let &t_SI = "\<Esc>[5 q"
-    let &t_EI = "\<Esc>[1 q"
-endif
-
-" for my fat fingers
-command! WQ wq
-command! Wq wq
-command! W w
-command! Q q
+    " Close vim if nerdtree is the last window
+    au BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+augroup end
 
 " Use auto commands for simple filetype detection and settings
 " Anything more advanced should be a plugin
@@ -116,15 +118,20 @@ augroup filetype_settings
     au FileType javascript,scheme,xml,ant,lisp,ruby,html,eruby setlocal ts=2 sts=2 sw=2
 augroup end
 
-augroup rainbow_parentheses
-    au! VimEnter * RainbowParentheses
-augroup end
+" Use a sane shell for commands
+if !empty(glob("/bin/bash"))
+    set shell=/bin/bash
+else
+    set shell=/bin/sh
+endif
 
-"
-" Airline
-"
-let g:airline#extensions#bufferline#overwrite_variables=0
-let g:airline_powerline_fonts=1
+" for my fat fingers
+command! WQ wq
+command! Wq wq
+command! W w
+command! Q q
+
+nnoremap gb :ls<CR>:b<Space>
 
 " Have Esc work normally in :terminal
 tnoremap <C-w>h <C-\><C-n><C-w>h
@@ -133,14 +140,6 @@ tnoremap <C-w>k <C-\><C-n><C-w>k
 tnoremap <C-w>l <C-\><C-n><C-w>l
 
 "
-" Hardcore mode
+" SUB FILES
 "
-set mouse=
-inoremap <Up> <NOP>
-inoremap <Down> <NOP>
-inoremap <Left> <NOP>
-inoremap <Right> <NOP>
-noremap <Up> <NOP>
-noremap <Down> <NOP>
-noremap <Left> <NOP>
-noremap <Right> <NOP>
+runtime sessions.vim

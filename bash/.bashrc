@@ -19,7 +19,7 @@ set -o noclobber
 
 # some more ls aliases
 alias ls='ls -bkF --color=auto'
-alias tree='tree -F --dirsfirst'
+alias tree='tree -F --dirsfirst -I .git'
 alias rm='rm -iv'
 alias cp='cp -iv'
 alias mv='mv -iv'
@@ -64,62 +64,28 @@ activate() {
 
 # everything else is prompt...
 
-function smiley() {
-    if [ $? = 0 ]; then
-        echo -en "$1:)"
-    else
-        echo -en "$2:("
-    fi
-}
-
 source ~/.git-prompt.sh
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 export GIT_PS1_SHOWCOLORHINTS=1
 
-# tput with escaped output for non-printing characters
-function tpute() {
-    echo -n "\[$(tput $@)\]"
+function __pre_ps1() {
+    echo -en "\[\e[01;34m\]"'\u@\h:\w'"\[\e[0m\]"
 }
 
-function set_prompt() {
-    local tri=""
-    # clear style
-    local c=$(tpute sgr0)
-    # bold
-    local b=$(tpute bold)
-
-    # start first segment
-    local s1="$(tpute setaf 0; tpute setab 21)"
-    # transition from segment 1 to 2
-    local s12="$(tpute setaf 21; tpute setab 45)$tri$(tpute setaf 0)"
-    # transtion from segment 2 to default
-    local s2c="$c$(tpute setaf 45)$tri$c"
-
-    PS1="$s1 \u $s12 \w $s2c "
+function __post_ps1() {
+    if [ $1 = 0 ]; then
+        echo -en "\[\e[01;32m\]"
+    else
+        echo -en "\[\e[01;31m\]"
+    fi
+    echo -en $([ -n "${VIRTUAL_ENV}" ] && echo venv)'\$'"\[\e[0m\]"
 }
-: <<COMMENT
-function set_prompt() {
-    # clear color and style
-    local C=$(tpute sgr0)
-    # make bold
-    local B=$(tpute bold)
 
-    # foreground codes
-    # high intensity!!!
-    local RED=$(tpute setaf 9)
-    local GREEN=$(tpute setaf 10)
-    local BLUE=$(tpute setaf 12)
-    local PURPLE=$(tpute setaf 124)
-    local CYAN=$(tpute setaf 14)
-
-    PS1="$B$RED\$$BLUE\u$C$GREEN at $B\h$C$PURPLE in $B\w$C\$(__git_ps1 ' (%s)')"
-    PS1="$PS1\n$C\$(smiley $GREEN $RED)$C "
-    PS2=" $CYAN>$C "
+function __set_prompt() {
+    local last=$?
+    __git_ps1 "$(__pre_ps1)" " $(__post_ps1 $last) "
 }
-COMMENT
 
-set_prompt
-unset -f set_prompt
-unset -f tpute
+PROMPT_COMMAND=__set_prompt
