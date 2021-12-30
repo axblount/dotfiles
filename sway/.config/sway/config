@@ -14,11 +14,12 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term foot
+set $term kitty
+set $editor emacsclient
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-set $menu dmenu_path | dmenu | xargs swaymsg exec --
+set $menu dmenu_path | dmenu -fn 'UbuntuMono:size=13' | xargs swaymsg exec --
 
 ### Output configuration
 #
@@ -61,6 +62,11 @@ set $menu dmenu_path | dmenu | xargs swaymsg exec --
 exec swayidle -w \
     timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
 
+input "1:1:AT_Translated_Set_2_keyboard" {
+    # switch capslock to ctrl
+    xkb_options ctrl:nocaps
+}
+
 input "2:7:SynPS/2_Synaptics_TouchPad" {
     dwt enabled
     tap enabled
@@ -78,6 +84,7 @@ for_window [app_id="pavucontrol"] floating enable, resize set 800 600
 #
     # Start a terminal
     bindsym $mod+Return exec $term
+    bindsym $mod+x exec $editor
 
     # Kill focused window
     bindsym $mod+Shift+q kill
@@ -216,7 +223,7 @@ bindsym $mod+r mode "resize"
 # Read `man 5 sway-bar` for more information about this section.
 bar {
     position top
-    font "Gohu GohuFont"
+    font "UbuntuMono"
     separator_symbol " — "
 
     status_command $XDG_CONFIG_HOME/sway/bar.sh

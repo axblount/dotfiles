@@ -19,12 +19,14 @@ set -o noclobber
 
 # some more ls aliases
 alias ls='ls -bkF --color=auto'
-alias tree='tree -F --dirsfirst -I .git'
+alias tree='tree -F --dirsfirst -I .git -I __pycache__'
 alias rm='rm -iv'
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias grep='grep --color=auto'
 alias :q='exit'
+
+alias vim=nvim
 
 shopt -s extglob
 shopt -s checkwinsize

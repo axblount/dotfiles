@@ -7,15 +7,32 @@ if empty(glob(stdpath('data') . '/site/autoload/plug.vim'))
 endif
 
 call plug#begin(stdpath('data') . '/plugs')
-Plug 'sheerun/vim-polyglot'
-Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
-Plug 'preservim/nerdtree'
-Plug 'tpope/vim-fugitive'
-Plug 'itchyny/lightline.vim'
-Plug 'bling/vim-bufferline'
-Plug 'junegunn/rainbow_parentheses.vim', { 'for': ['lisp', 'scheme', 'clojure'] }
-Plug 'xero/sourcerer.vim'
-Plug 'fcpg/vim-fahrenheit'
+
+    "========== Support plugins
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'kyazdani42/nvim-web-devicons'
+    Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+
+    "========== Language Support
+    " Plug 'sheerun/vim-polyglot'
+    Plug 'neovim/nvim-lspconfig'
+    " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
+    " Plug 'nvim-orgmode/orgmode'
+
+    "========== pRoDuCtIvItY
+    " Plug 'folke/trouble.nvim'
+    " Plug 'nvim-telescope/telescope.nvim'
+    Plug 'folke/todo-comments.nvim'
+
+    "========== Version Control
+    Plug 'tpope/vim-fugitive'
+
+    "========== GUI
+    Plug 'nvim-lualine/lualine.nvim'
+    Plug 'bling/vim-bufferline'
+    Plug 'kyazdani42/nvim-tree.lua'
+    Plug 'ayu-theme/ayu-vim'
+
 call plug#end()
 
 autocmd VimEnter *
@@ -23,12 +40,56 @@ autocmd VimEnter *
     \|     PlugInstall --sync | q
     \| endif
 
+"
+" Setup lua plugins
+"
+lua << LUA
+    require('lspconfig').jedi_language_server.setup({})
+    require('lualine').setup {
+        -- A like a line with a different background
+        options = { theme = 'ayu_mirage' }
+    }
+    require('nvim-tree').setup {
+        git = { enable = false },
+        auto_close = true,
+        open_on_setup = true,
+    }
+    require('todo-comments').setup()
+    --require('orgmode').setup({})
+LUA
+
 filetype plugin indent on
 set number
 syntax enable
+set cursorline
+
+set autoread
+set backspace=indent,eol,start
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set autoindent
+set smartindent
+set breakindent
+set smarttab
+set nowrap
+set listchars=tab:>-,trail:•,precedes:<,extends:>
+set list
+set complete-=i
+set incsearch
+set laststatus=2
+set showcmd
+set wildmenu
+set sidescroll=1
+set scrolloff=3
+set sidescrolloff=5
+set display+=lastline
+set colorcolumn=80
 
 set encoding=utf-8
 set fileformats=unix,dos
+
 
 " set temp directories.
 " the trailing double slash tells vim to name
@@ -56,54 +117,17 @@ autocmd BufReadPost *
 " 24-bit color
 set termguicolors
 set background=dark
-colo sourcerer
+let ayucolor='dark'
+colo ayu
 
-"
-" Status Line
-"
-let g:lightline = {
-    \ 'colorscheme': 'apprentice',
-    \ 'active': {
-    \   'left': [ [ 'mode', 'paste' ],
-    \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
-    \ },
-    \ 'component_function': {
-    \   'gitbranch': 'FugitiveHead'
-    \ },
-    \ }
-
-set autoread
-set backspace=indent,eol,start
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set expandtab
-set autoindent
-set smartindent
-set breakindent
-set smarttab
-set nowrap
-set listchars=tab:>-,trail:•,precedes:<,extends:>
-set list
-set complete-=i
-set incsearch
-set laststatus=2
-set showcmd
-set wildmenu
-set sidescroll=1
-set scrolloff=3
-set sidescrolloff=5
-set display+=lastline
-set colorcolumn=80
-
-augroup nerd_tree
-    " run NERDTree on startup if there are no file arguments
-    au StdinReadPre * let s:std_in=1
-    au VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
-
-    " Close vim if nerdtree is the last window
-    au BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-augroup end
+" augroup nerd_tree
+"     " run NERDTree on startup if there are no file arguments
+"     au StdinReadPre * let s:std_in=1
+"     au VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
+" 
+"     " Close vim if nerdtree is the last window
+"     au BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+" augroup end
 
 " Use auto commands for simple filetype detection and settings
 " Anything more advanced should be a plugin
@@ -118,13 +142,6 @@ augroup filetype_settings
     au FileType javascript,scheme,xml,ant,lisp,ruby,html,eruby setlocal ts=2 sts=2 sw=2
 augroup end
 
-" Use a sane shell for commands
-if !empty(glob("/bin/bash"))
-    set shell=/bin/bash
-else
-    set shell=/bin/sh
-endif
-
 " for my fat fingers
 command! WQ wq
 command! Wq wq
@@ -133,13 +150,42 @@ command! Q q
 
 nnoremap gb :ls<CR>:b<Space>
 
-" Have Esc work normally in :terminal
-tnoremap <C-w>h <C-\><C-n><C-w>h
-tnoremap <C-w>j <C-\><C-n><C-w>j
-tnoremap <C-w>k <C-\><C-n><C-w>k
-tnoremap <C-w>l <C-\><C-n><C-w>l
+" Tools to create and restore sessions
+" Sessions must be created manually, but update automatically
 
-"
-" SUB FILES
-"
-runtime sessions.vim
+function! MakeSession()
+    let b:session_dir = $XDG_DATA_HOME . "/nvim/sessions" . getcwd()
+    if (filewritable(b:session_dir) != 2)
+        exe 'silent !mkdir -p' b:session_dir
+        redraw!
+    endif
+    let b:filename = b:session_dir . '/session.vim'
+    exe 'mksession!' b:filename
+endfunction
+
+" Update an already existing session
+function! UpdateSession()
+    let b:session_dir = $XDG_DATA_HOME . "/nvim/sessions" . getcwd()
+    let b:session_file = b:session_dir . "session.vim"
+    if (filereadable(b:session_file))
+        exe "mksession!" b:filename
+    endif
+endfunction
+
+" Load an existing session
+function! LoadSession()
+    let b:session_dir = $XDG_DATA_HOME . "/nvim/sessions" . getcwd()
+    let b:session_file = b:session_dir . "session.vim"
+    if (filereadable(b:session_file))
+        exe 'source' b:session_file
+    else
+        echo "No session loaded."
+    endif
+endfunction
+
+" augroup session_management
+"     au VimEnter * nested :call LoadSession()
+"     au VimLeave * :call UpdateSession()
+" augroup end
+" map <leader>m :call MakeSession()<CR>
+

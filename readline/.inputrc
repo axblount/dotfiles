@@ -1,7 +1,8 @@
-set editing-mode vi
-set keymap vi-command
+# set editing-mode vi
+# set keymap vi-command
 set show-all-if-ambiguous on
 set completion-ignore-case on
+set completion-prefix-display-length 3
 
 set colored-stats on
 set visible-stats on

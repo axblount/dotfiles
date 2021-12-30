@@ -21,4 +21,3 @@ export PAGER=less
 export PATH
 PATH="$HOME/.cargo/bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
-
