@@ -13,7 +13,7 @@
 
 (general-define-key
   :states 'normal
-  :keymaps 'boss-man-mode-keymap
+  :keymaps 'boss-man-mode-map
   "TAB" 'org-cycle
   "t" 'org-todo
   "<" 'org-metaleft
@@ -21,14 +21,14 @@
   "gj" 'org-forward-heading-same-level
   "gk" 'org-backward-heading-same-level)
 
-(local-leader-def
+(local-leader-def ; "SPC"
   :states 'normal
-  :keymaps 'boss-man-mode-keymap
+  :keymaps 'boss-man-mode-map
   "g" 'org-goto
   "*" 'org-toggle-heading
   "RET" 'org-meta-return
   "S-RET" 'org-insert-heading-respect-content
-  "t RET" 'org-insert-todo-heading
-  "t S-RET" 'org-insert-todo-heading-respect-content)
+  "i t" 'org-insert-todo-heading
+  "t S-t" 'org-insert-todo-heading-respect-content)
 
 (provide 'boss-man)

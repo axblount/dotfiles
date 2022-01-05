@@ -78,6 +78,8 @@ input "2:7:SynPS/2_Synaptics_TouchPad" {
 
 for_window [app_id="pavucontrol"] floating enable, resize set 800 600
 
+for_window [title="Speedbar 1.0"] resize set width 230
+
 ### Key bindings
 #
 # Basics:

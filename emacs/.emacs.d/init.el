@@ -1,4 +1,4 @@
-;; -*- mode: elisp -*-
+;;; -*- mode: elisp; lexical-binding: t; -*-
 
 ;; Get package up and running
 (require 'package)
@@ -15,77 +15,112 @@
   (require 'use-package))
 (setq use-package-always-ensure t)
 
+
 ;;
 ;; Packages
 ;;
 
+(use-package evil
+  :init
+  (setq evil-undo-system 'undo-fu)
+  :config
+  (evil-mode t)
+  ; this prevents :q from quitting emacs.
+  ; instead use :qa ot quit completely
+  (evil-ex-define-cmd "q[uit]" 'kill-buffer-and-window))
+
+(use-package general)
+
+;; better undo for evil mode
 (use-package undo-fu)
+
 ;; store undo in ~/.emacs.d/undo-fu-session
 (use-package undo-fu-session
   :config (global-undo-fu-session-mode))
 
-(use-package general
-  :demand t
+(use-package ace-window)
+
+(use-package org
   :config
-  (general-create-definer leader-def
-    :prefix "SPC")
-  (general-create-definer local-leader-def
-    :prefix "SPC m"))
+  (setq org-adapt-indentation 'headline-data)
+  (setq org-startup-indented t)
+  (let ((org-journal-file (expand-file-name "journal.org"
+                                            org-directory))
+        (org-notes-file (expand-file-name "notes.org"
+                                         org-directory)))
+    (setq org-capture-templates
+          `(("j" "Journal"
+             entry
+             (file+datetree ,org-journal-file)
+             "* %?\n     Entered on %U\n%i\n%a")
+            ("t" "Todo"
+             entry
+             (file+headline ,org-notes-file "Tasks")
+             "* TODO %?\n%i\n%a")
+            ("i" "Idea"
+             entry
+             (file+headline ,org-notes-file "Ideas"))))))
 
-(use-package ace-window
-  :after general
+(use-package neotree
   :config
-  (general-define-key
-   :states 'normal
-   "C-w" 'ace-window))
+  (setq neo-smart-open t))
 
-(use-package evil
-  :demand t
-  :init (setq evil-undo-system 'undo-fu)
+(use-package projectile
   :config
-  (evil-mode t)
-  (evil-ex-define-cmd "q[uit]" 'kill-buffer-and-window))
+  (projectile-mode t))
 
-(use-package org)
+(use-package eglot)
 
-(use-package lsp-mode)
+(use-package company
+  :hook (after-init . global-company-mode))
 
 (use-package python
-  :hook (python-mode . lsp))
-
-(use-package poetry)
+  :hook (python-mode . eglot-ensure))
 
 (use-package dimmer
   :config (dimmer-mode t))
 
-(use-package monokai-theme
-  :config (load-theme 'monokai t))
+(use-package zenburn-theme
+  :config
+  (setq zenburn-scale-org-headlines t
+        zenburn-scale-outline-headlines t)
+  (load-theme 'zenburn t))
 
-;; User packages
-(add-to-list 'load-path (expand-file-name "user" user-emacs-directory))
-(require 'boss-man)
+(use-package magit)
+
+(use-package tree-sitter
+  :config
+  (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+(use-package tree-sitter-langs)
+
+
+;;
+;; Plain Emacs config, nothing package specific
+;;
 
 ;; Auxiliary files
 ; Custtomizations in separate file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
-  (load custom-file))
+(load custom-file))
 
 ; Put all backup files under ~/.emacs.d/backup/
 (let ((backup-dir
-       (expand-file-name "backup" user-emacs-directory)))
-  (setq backup-directory-alist `(("." . ,backup-dir))))
+        (expand-file-name "backup" user-emacs-directory)))
+(setq backup-directory-alist `(("." . ,backup-dir))))
 
 ; No lockfiles
 (setq create-lockfiles nil)
 
 ;; Appearance
-(set-frame-font "UbuntuMono 13" nil t)
-(menu-bar-mode 0)
-(when (display-graphic-p)
-  (tool-bar-mode 0)
-  (scroll-bar-mode 0))
 (setq inhibit-startup-screen t)
+(add-to-list 'default-frame-alist
+             '(font . "UbuntuMono 13"))
+(menu-bar-mode 0)
+(tool-bar-mode 0)
+(scroll-bar-mode 0)
 (column-number-mode)
 (global-hl-line-mode t)
 
@@ -103,51 +138,65 @@
 (setq show-paren-delay 0)
 (show-paren-mode)
 
-;; org mode fix
-(with-eval-after-load "org"
-  (when (version-list-= (version-to-list org-version) '(9 4 4))
-    (defun org-return-fix (fun &rest args)
-      "Fix https://emacs.stackexchange.com/questions/64886."
-      (let* ((context (if org-return-follows-link (org-element-context)
-            (org-element-at-point)))
-             (element-type (org-element-type context)))
-    (if (eq element-type 'src-block)
-        (apply #'org--newline args)
-      (apply fun args))))
-    (advice-add 'org-return :around #'org-return-fix)))
+; Don't follow symlinks when editing files, just edit in place
+; and pretend it's not a symlink
+(setq vc-follow-symlinks nil)
 
-(with-eval-after-load "org-src"
-  (when (version-list-= (version-to-list org-version) '(9 4 4))
-    (defun org-src--contents-for-write-back ()
-      "Return buffer contents in a format appropriate for write back.
-Assume point is in the corresponding edit buffer."
-      (let ((indentation-offset
-         (if org-src--preserve-indentation 0
-           (+ (or org-src--block-indentation 0)
-          (if (memq org-src--source-type '(example-block src-block))
-              org-src--content-indentation
-            0))))
-        (use-tabs? (and (> org-src--tab-width 0) t))
-        (source-tab-width org-src--tab-width)
-        (contents (org-with-wide-buffer (buffer-string)))
-        (write-back org-src--allow-write-back))
-    (with-temp-buffer
-      ;; Reproduce indentation parameters from source buffer.
-      (setq indent-tabs-mode use-tabs?)
-      (when (> source-tab-width 0) (setq tab-width source-tab-width))
-      ;; Apply WRITE-BACK function on edit buffer contents.
-      (insert (org-no-properties contents))
-      (goto-char (point-min))
-      (when (functionp write-back) (save-excursion (funcall write-back)))
-      ;; Add INDENTATION-OFFSET to every non-empty line in buffer,
-      ;; unless indentation is meant to be preserved.
-      (when (> indentation-offset 0)
-        (while (not (eobp))
-          (skip-chars-forward " \t")
-          ;; (unless (eolp)     ;ignore blank lines
-          (let ((i (current-column)))
-        (delete-region (line-beginning-position) (point))
-        (indent-to (+ i indentation-offset)))
-          ;;)
-          (forward-line)))
-      (buffer-string))))))
+;; C-Mode
+(setq c-default-style '((java-mode . "java")
+                        (awk-mode . "awk")
+                        (other . "java")))
+
+
+
+;;
+;; Keybinds
+;;
+
+; "Everywhere"
+(general-def 'motion
+  "C-w" 'ace-window
+  "g [" 'backward-page
+  "g ]" 'forward-page)
+
+; Leader bindings
+(general-create-definer leader-def
+  :prefix "SPC")
+
+(general-create-definer local-leader-def
+  :prefix "SPC m")
+
+(leader-def 'normal
+  "d" 'neotree-toggle
+  "p" 'projectile-command-map
+  "f n" 'flymake-goto-next-error
+  "f p" 'flymake-goto-prev-error)
+
+; NeoTree
+(general-def '(normal motion) neotree-mode-map
+  "RET" 'neotree-enter
+  "TAB" 'neotree-quick-look
+  "q" 'neotree-hide
+  "g" 'neotree-refresh
+  "n" 'neotree-next-line
+  "p" 'neotree-previous-line
+  "H" 'neotree-hidden-file-toggle
+  "A" 'neotree-stretch-toggle)
+
+
+;;
+;; Miscellaneous
+;;
+
+; Save and load scratch buffer
+(let ((scratch-file (expand-file-name ".scratch"
+                                      user-emacs-directory)))
+  (add-hook 'kill-emacs-hook
+            #'(lambda ()
+                (with-current-buffer "*scratch*"
+                  (write-file scratch-file))))
+  (add-hook 'after-init-hook
+            #'(lambda ()
+                (when (file-exists-p scratch-file)
+                  (with-current-buffer "*scratch*"
+                    (insert-file-contents scratch-file))))))

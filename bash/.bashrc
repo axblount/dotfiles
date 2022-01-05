@@ -25,6 +25,7 @@ alias cp='cp -iv'
 alias mv='mv -iv'
 alias grep='grep --color=auto'
 alias :q='exit'
+alias ec='emacsclient -c -s /tmp/emacs${UID}/server'
 
 alias vim=nvim
 
