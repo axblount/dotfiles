@@ -1,19 +1,21 @@
 ;;; -*- mode: elisp; lexical-binding: t; -*-
 
-;; Get package up and running
-(require 'package)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
+;; Manage packages with straight.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-;; Install use-package
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(eval-when-compile
-  (require 'use-package))
-(setq use-package-always-ensure t)
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
 
 
 ;;
@@ -25,8 +27,8 @@
   (setq evil-undo-system 'undo-fu)
   :config
   (evil-mode t)
-  ; this prevents :q from quitting emacs.
-  ; instead use :qa ot quit completely
+  ;; this prevents :q from quitting emacs.
+  ;; instead use :qa ot quit completely
   (evil-ex-define-cmd "q[uit]" 'kill-buffer-and-window))
 
 (use-package general)
@@ -41,13 +43,12 @@
 (use-package ace-window)
 
 (use-package org
+  :hook (org-mode . auto-fill-mode)
   :config
-  (setq org-adapt-indentation 'headline-data)
-  (setq org-startup-indented t)
   (let ((org-journal-file (expand-file-name "journal.org"
                                             org-directory))
         (org-notes-file (expand-file-name "notes.org"
-                                         org-directory)))
+                                          org-directory)))
     (setq org-capture-templates
           `(("j" "Journal"
              entry
@@ -62,14 +63,20 @@
              (file+headline ,org-notes-file "Ideas"))))))
 
 (use-package neotree
-  :config
+  :init
   (setq neo-smart-open t))
 
 (use-package projectile
   :config
   (projectile-mode t))
 
-(use-package eglot)
+(use-package lsp-mode
+  :hook (c-mode . lsp)
+  :init
+  (setq lsp-enable-indentation nil)
+  (setq lsp-clients-clangd-args
+        '("-j=4"
+          "--clang-tidy")))
 
 (use-package company
   :hook (after-init . global-company-mode))
@@ -80,11 +87,11 @@
 (use-package dimmer
   :config (dimmer-mode t))
 
-(use-package zenburn-theme
-  :config
-  (setq zenburn-scale-org-headlines t
-        zenburn-scale-outline-headlines t)
-  (load-theme 'zenburn t))
+;; (use-package zenburn-theme
+;;   :config
+;;   (setq zenburn-scale-org-headlines t
+;;         zenburn-scale-outline-headlines t)
+;;   (load-theme 'zenburn t))
 
 (use-package magit)
 
@@ -100,24 +107,24 @@
 ;; Plain Emacs config, nothing package specific
 ;;
 
-;; Auxiliary files
-; Custtomizations in separate file
+;; Custtomizations in separate file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
 (load custom-file))
 
-; Put all backup files under ~/.emacs.d/backup/
+;; Put all backup files under ~/.emacs.d/backup/
 (let ((backup-dir
         (expand-file-name "backup" user-emacs-directory)))
-(setq backup-directory-alist `(("." . ,backup-dir))))
+  (add-to-list 'backup-directory-alist
+               `("." . ,backup-dir)))
 
-; No lockfiles
+;; No lockfiles
 (setq create-lockfiles nil)
 
 ;; Appearance
 (setq inhibit-startup-screen t)
 (add-to-list 'default-frame-alist
-             '(font . "UbuntuMono 13"))
+             '(font . "Ubuntu Mono 13"))
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
@@ -133,33 +140,32 @@
 (transient-mark-mode t)
 (setq sentence-end-double-space nil)
 (setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
 
 (setq show-paren-delay 0)
 (show-paren-mode)
 
-; Don't follow symlinks when editing files, just edit in place
-; and pretend it's not a symlink
+;; Don't follow symlinks when editing files, just edit in place
+;; and pretend it's not a symlink
 (setq vc-follow-symlinks nil)
 
 ;; C-Mode
 (setq c-default-style '((java-mode . "java")
                         (awk-mode . "awk")
-                        (other . "java")))
-
+                        (other . "k&r")))
+(setq c-basic-offset 4)
 
 
-;;
-;; Keybinds
-;;
+;;;
+;;; Keybinds
+;;;
 
-; "Everywhere"
+;; "Everywhere"
 (general-def 'motion
   "C-w" 'ace-window
   "g [" 'backward-page
   "g ]" 'forward-page)
 
-; Leader bindings
+;; Leader bindings
 (general-create-definer leader-def
   :prefix "SPC")
 
@@ -172,7 +178,11 @@
   "f n" 'flymake-goto-next-error
   "f p" 'flymake-goto-prev-error)
 
-; NeoTree
+;; Org Mode
+(local-leader-def '(normal motion) org-mode-map
+  "t" 'org-todo)
+
+;; NeoTree
 (general-def '(normal motion) neotree-mode-map
   "RET" 'neotree-enter
   "TAB" 'neotree-quick-look
@@ -184,11 +194,11 @@
   "A" 'neotree-stretch-toggle)
 
 
-;;
-;; Miscellaneous
-;;
+;;;
+;;; Miscellaneous
+;;;
 
-; Save and load scratch buffer
+;; Save and load scratch buffer
 (let ((scratch-file (expand-file-name ".scratch"
                                       user-emacs-directory)))
   (add-hook 'kill-emacs-hook

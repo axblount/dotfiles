@@ -26,6 +26,7 @@ alias mv='mv -iv'
 alias grep='grep --color=auto'
 alias :q='exit'
 alias ec='emacsclient -c -s /tmp/emacs${UID}/server'
+alias icat='kitty +kitten icat'
 
 alias vim=nvim
 
@@ -55,14 +56,13 @@ serve() {
 activate() {
     if [ -f .venv/bin/activate ]; then
         source .venv/bin/activate
-        return 0
     elif [ -f venv/bin/activate ]; then
         source venv/bin/activate
-        return 0
     else
-        echo "Couldn't find virtualenv."
+        >&2 echo "Couldn't find virtualenv."
         return 1
     fi
+    return 0
 }
 
 # everything else is prompt...
