@@ -1,6 +1,7 @@
 \.git
 \.gitignore
 \.stow-local-ignore
-^/@.*
-README.*
+# ^/@.*
+README.md
 UNLICENSE
+DOC
